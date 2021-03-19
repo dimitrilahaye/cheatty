@@ -4,7 +4,7 @@ server:
   origin: 'http://localhost:5000'
 
 sentry:
-  url: 'https://c387f8457a0a406aa3b324c4203b41fe@o554441.ingest.sentry.io/5683174'
+  url: 'https://...@....ingest.sentry.io/...'
   traces: 1.0
 
 db:
