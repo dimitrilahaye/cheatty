@@ -1,0 +1,16 @@
+server:
+  port: 3002
+  production: false
+  origin: 'http://localhost:5000'
+
+sentry:
+  url: 'https://c387f8457a0a406aa3b324c4203b41fe@o554441.ingest.sentry.io/5683174'
+  traces: 1.0
+
+db:
+  type: 'mongodb'
+  host: 'localhost'
+  port: 27017
+  database: 'cheatty'
+  username: 'username'
+  password: 'root'
