@@ -7,7 +7,7 @@
     "start": "sirv --no-clear public",
     "lint": "eslint 'src/**/*.{ts,svelte}'",
     "validate": "svelte-check",
-    "test": "jest src --no-cache",
+    "test": "jest src",
     "test:watch": "npm test -- --watch",
     "test:e2e": "cypress run"
   },
