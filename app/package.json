@@ -7,7 +7,8 @@
     "start": "sirv --no-clear public",
     "lint": "eslint 'src/**/*.{ts,svelte}'",
     "validate": "svelte-check",
-    "test": "jest",
+    "test": "jest src --no-cache",
+    "test:watch": "npm test -- --watch",
     "test:e2e": "cypress run"
   },
   "devDependencies": {
@@ -60,8 +61,20 @@
     "svelte-error-boundary": "^1.0.1"
   },
   "jest": {
-    "testMatch": [
-      "./__tests__/**/*.spec.ts"
+    "transform": {
+      "^.+\\.svelte$": [
+        "svelte-jester",
+        {
+          "preprocess": true
+        }
+      ],
+      "^.+\\.ts$": "ts-jest",
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "svelte",
+      "ts"
     ]
   }
 }
