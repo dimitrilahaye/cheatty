@@ -1,14 +1,13 @@
 version: 2.1
 jobs:
   app-build:
-    working_directory: ~/project
+    working_directory: ~/project/app
     docker:
       - image: circleci/node:10.16.3
     steps:
       - checkout
       - run:
           name: PWD
-          working_directory: app
           command: "pwd"
       - run:
           name: LS
@@ -16,20 +15,26 @@ jobs:
           command: "ls"
       - run:
           name: Update NPM
+          working_directory: app
           command: "sudo npm install -g npm@5"
       - restore_cache:
+          working_directory: app
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
+          working_directory: app
           name: Install Dependencies
           command: npm install
       - save_cache:
+          working_directory: app
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
       - run:
+          working_directory: app
           name: Run Validate
           command: npm run validate
       - run:
+          working_directory: app
           name: Run tests
           command: npm run test
 workflows:
