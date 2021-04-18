@@ -120,7 +120,7 @@ jobs:
       - run:
           name: Create app archive
           command: |
-            tar -czf archive.tar.gz app/package.json app/node_modules app/public
+            tar -czf archive.tar.gz ./package.json ./node_modules ./public
           working_directory: ~/project/app
       - store_artifacts:
           path: app/archive.tar.gz
@@ -128,7 +128,7 @@ jobs:
       - run:
           name: Create api archive
           command: |
-            tar -czf archive.tar.gz api/package.json api/node_modules api/dist
+            tar -czf archive.tar.gz ./package.json ./node_modules ./dist
           working_directory: ~/project/api
       - store_artifacts:
           path: api/archive.tar.gz
