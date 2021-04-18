@@ -54,5 +54,8 @@
     "@sentry/tracing": "^6.2.2",
     "sirv-cli": "^1.0.0",
     "svelte-error-boundary": "^1.0.1"
+  },
+  "jest": {
+    "testMatch": ["./__tests__/**/*.spec.ts"]
   }
 }
