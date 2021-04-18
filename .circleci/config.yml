@@ -118,11 +118,21 @@ jobs:
           name: Remove dev dependencies from api
           command: cd api &&  npm install --only=production
       - run:
-          name: Create archive
-          command: tar -czf archive.tar.gz app/package.json app/node_modules app/public api/package.json api/node_modules api/dist
+          name: Create app archive
+          command: |
+            tar -czf archive.tar.gz app/package.json app/node_modules app/public
+          working_directory: ~/project/app
       - store_artifacts:
-          path: archive.tar.gz
-          destination: /home/circleci/project/archive.tar.gz
+          path: app/archive.tar.gz
+          destination: /home/circleci/project/app.tar.gz
+      - run:
+          name: Create api archive
+          command: |
+            tar -czf archive.tar.gz api/package.json api/node_modules api/dist
+          working_directory: ~/project/api
+      - store_artifacts:
+          path: api/archive.tar.gz
+          destination: /home/circleci/project/api.tar.gz
   app-sentry-release:
     docker:
       - image: getsentry/sentry-cli:1.40.0
@@ -147,6 +157,7 @@ jobs:
       - run: sentry-cli releases new --project ${SENTRY_PROJECT} ${SENTRY_PROJECT}@${CIRCLE_SHA1}
       - run: sentry-cli releases files ${SENTRY_PROJECT}@${CIRCLE_SHA1} upload-sourcemaps api/dist
       - run: sentry-cli releases finalize ${SENTRY_PROJECT}@${CIRCLE_SHA1}
+
 workflows:
   version: 2
   build:
