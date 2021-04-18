@@ -119,8 +119,7 @@ jobs:
           command: cd api &&  npm install --only=production
       - run:
           name: Create archive
-          command: tar -czf archive.tar.gz app/package.json app/node_modules app/public \
-            api/package.json api/node_modules api/dist
+          command: tar -czf archive.tar.gz app/package.json app/node_modules app/public api/package.json api/node_modules api/dist
       - store_artifacts:
           path: archive.tar.gz
           destination: /home/circleci/project/archive.tar.gz
