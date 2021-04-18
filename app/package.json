@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
+    "build:prod": "NODE_ENV=production rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv --no-clear public",
     "lint": "eslint 'src/**/*.{ts,svelte}'",
