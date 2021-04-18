@@ -4,6 +4,9 @@ executors:
   node:
     docker:
       - image: circleci/node:15.3.0
+  sentry:
+    docker:
+      - image: getsentry/sentry-cli:1.40.0
 
 commands:
   npm_install:
@@ -28,8 +31,6 @@ commands:
     parameters:
       project_key:
         type: string
-    docker:
-      - image: getsentry/sentry-cli:1.40.0
     steps:
       - attach_workspace:
           at: ~/project
@@ -98,6 +99,7 @@ jobs:
           path: archive.tar.gz
           destination: /home/circleci/project/archive.tar.gz
   app-sentry-release:
+    executor: sentry
     working_directory: ~/project/app
     steps:
       - checkout:
