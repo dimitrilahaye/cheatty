@@ -1,4 +1,4 @@
 <script>
-    let a;
-    let b = a.c;
+    // let a;
+    // let b = a.c;
 </script>
