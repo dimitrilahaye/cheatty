@@ -1,7 +1,7 @@
 version: 2.1
 jobs:
   app-build:
-    working_directory: ~/project/app
+    working_directory: ~/cheatty/app
     docker:
       - image: circleci/node:10.16.3
     steps:
