@@ -10,6 +10,9 @@ jobs:
           name: PWD
           command: "pwd"
       - run:
+          name: LS
+          command: "ls"
+      - run:
           name: Update NPM
           command: "sudo npm install -g npm@5"
       - restore_cache:
