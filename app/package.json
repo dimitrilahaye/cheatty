@@ -2,12 +2,14 @@
   "name": "cheatty-app",
   "version": "1.0.0",
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "build": "NODE_ENV=dev rollup -c",
+    "build:prod": "NODE_ENV=production rollup -c",
+    "dev": "NODE_ENV=dev rollup -c -w",
     "start": "sirv --no-clear public",
     "lint": "eslint 'src/**/*.{ts,svelte}'",
+    "lint:fix": "eslint 'src/**/*.{ts,svelte}' --fix",
     "validate": "svelte-check",
-    "test": "jest src --no-cache",
+    "test": "jest src",
     "test:watch": "npm test -- --watch",
     "test:e2e": "cypress run"
   },

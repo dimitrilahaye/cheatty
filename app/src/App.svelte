@@ -1,20 +1,20 @@
 <script>
   // import ErrorBoundary from 'svelte-error-boundary'
   import TailwindCSS from './style/TailwindCSS.svelte';
-  // import * as Sentry from "@sentry/browser";
-  // import {Integrations} from "@sentry/tracing";
+  import * as Sentry from "@sentry/browser";
+  import {Integrations} from "@sentry/tracing";
   // import BrokenComponent from "./BrokenComponent.svelte";
 
   export let name;
   // let handleError = (e) => {
   //   Sentry.captureException(e);
   // }
-  //
-  // Sentry.init({
-  //   dsn: process.env.SENTRYURL,
-  //   integrations: [new Integrations.BrowserTracing()],
-  //   tracesSampleRate: process.env.SENTRYTRACES,
-  // });
+
+  Sentry.init({
+    dsn: process.env.SENTRYURL, // eslint-disable-line no-undef
+    integrations: [new Integrations.BrowserTracing()],
+    tracesSampleRate: process.env.SENTRYTRACES, // eslint-disable-line no-undef
+  });
 </script>
 
 <TailwindCSS />
