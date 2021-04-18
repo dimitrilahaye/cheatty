@@ -38,6 +38,18 @@ jobs:
           root: ~/project
           paths:
             - app/node_modules
+  api-npm-install:
+    executor: node
+    working_directory: ~/project/api
+    steps:
+      - checkout:
+          path: ~/project
+      - npm_install:
+          cache_key: api
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - api/node_modules
   app-lint:
     executor: node
     steps:
@@ -47,6 +59,15 @@ jobs:
       - run:
           name: Run linter
           command: cd app && npm run lint
+  api-lint:
+    executor: node
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Run linter
+          command: cd api && npm run lint
   app-validate:
     executor: node
     steps:
@@ -70,6 +91,20 @@ jobs:
           root: ~/project
           paths:
             - app/public
+  api-build:
+    executor: node
+    steps:
+      - checkout:
+          path: ~/project
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Build
+          command: cd api && npm run build
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - api/dist
   build-archives:
     executor: node
     steps:
@@ -80,12 +115,28 @@ jobs:
           name: Remove dev dependencies from app
           command: cd app &&  npm install --only=production
       - run:
+          name: Remove dev dependencies from api
+          command: cd api &&  npm install --only=production
+      - run:
           name: Create archive
-          command: tar -czf archive.tar.gz app/package.json app/node_modules app/public
+          command: tar -czf archive.tar.gz app/package.json app/node_modules app/public \
+            api/package.json api/node_modules api/dist
       - store_artifacts:
           path: archive.tar.gz
           destination: /home/circleci/project/archive.tar.gz
   app-sentry-release:
+    docker:
+      - image: getsentry/sentry-cli:1.40.0
+        environment:
+          SENTRY_ORG: cheattyio
+          SENTRY_PROJECT: cheattyio-app
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run: sentry-cli releases new --project ${SENTRY_PROJECT} ${SENTRY_PROJECT}@${CIRCLE_SHA1}
+      - run: sentry-cli releases files ${SENTRY_PROJECT}@${CIRCLE_SHA1} upload-sourcemaps app/public/build
+      - run: sentry-cli releases finalize ${SENTRY_PROJECT}@${CIRCLE_SHA1}
+  api-sentry-release:
     docker:
       - image: getsentry/sentry-cli:1.40.0
         environment:
@@ -95,16 +146,20 @@ jobs:
       - attach_workspace:
           at: ~/project
       - run: sentry-cli releases new --project ${SENTRY_PROJECT} ${SENTRY_PROJECT}@${CIRCLE_SHA1}
-      - run: sentry-cli releases files ${SENTRY_PROJECT}@${CIRCLE_SHA1} upload-sourcemaps app/public/build
+      - run: sentry-cli releases files ${SENTRY_PROJECT}@${CIRCLE_SHA1} upload-sourcemaps api/dist
       - run: sentry-cli releases finalize ${SENTRY_PROJECT}@${CIRCLE_SHA1}
 workflows:
   version: 2
   build:
     jobs:
       - app-npm-install
+      - api-npm-install
       - app-lint:
           requires:
             - app-npm-install
+      - api-lint:
+          requires:
+            - api-npm-install
       - app-validate:
           requires:
             - app-npm-install
@@ -112,10 +167,18 @@ workflows:
           requires:
             - app-lint
             - app-validate
+      - api-build:
+          requires:
+            - api-lint
       - build-archives:
           requires:
             - app-build
+            - api-build
       - app-sentry-release:
+          context: sentry
+          requires:
+            - build-archives
+      - api-sentry-release:
           context: sentry
           requires:
             - build-archives
