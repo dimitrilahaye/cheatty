@@ -7,6 +7,9 @@ executors:
   sentry:
     docker:
       - image: getsentry/sentry-cli:1.40.0
+        environment:
+          SENTRY_ORG: cheattyio
+          SENTRY_PROJECT: cheattyio-api
 
 commands:
   npm_install:
@@ -125,6 +128,5 @@ workflows:
           requires:
             - app-build
       - app-sentry-release:
-          context: sentry
           requires:
             - build-archives
