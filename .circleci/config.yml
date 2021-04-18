@@ -13,10 +13,6 @@ jobs:
           name: LS
           working_directory: app
           command: "ls"
-      - run:
-          name: Update NPM
-          working_directory: app
-          command: "sudo npm install -g npm@7.10.0"
       - restore_cache:
           working_directory: app
           key: dependency-cache-{{ checksum "package-lock.json" }}
