@@ -19,7 +19,7 @@
 
 <TailwindCSS />
 <ErrorBoundary {handleError}>
-  <BrokenComponent/>
+<!--  <BrokenComponent/>-->
   <main>
     <h1 class="text-3xl font-bold">Hello {name}!</h1>
     <p>
