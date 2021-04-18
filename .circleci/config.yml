@@ -1,7 +1,7 @@
 version: 2.1
 jobs:
   app-build:
-    working_directory: ~/project/app
+    working_directory: ~/project
     docker:
       - image: circleci/node:15.3.0
     steps:
