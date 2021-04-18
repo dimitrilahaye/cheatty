@@ -1,16 +1,18 @@
 version: 2.1
 jobs:
   app-build:
-    working_directory: ~/cheatty/app
+    working_directory: ~/project
     docker:
       - image: circleci/node:10.16.3
     steps:
       - checkout
       - run:
           name: PWD
+          working_directory: app
           command: "pwd"
       - run:
           name: LS
+          working_directory: app
           command: "ls"
       - run:
           name: Update NPM
