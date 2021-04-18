@@ -4,12 +4,6 @@ executors:
   node:
     docker:
       - image: circleci/node:15.3.0
-  sentry:
-    docker:
-      - image: getsentry/sentry-cli:1.40.0
-        environment:
-          SENTRY_ORG: cheattyio
-          SENTRY_PROJECT: cheattyio-api
 
 commands:
   npm_install:
@@ -30,16 +24,6 @@ commands:
           key: npm-install-<< parameters.cache_key >>-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
-  sentry-release:
-    parameters:
-      project_key:
-        type: string
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - run: sentry-cli releases new --project << parameters.project_key >> << parameters.project_key >>@${CIRCLE_SHA1}
-      - run: sentry-cli releases files << parameters.project_key >>@${CIRCLE_SHA1} upload-sourcemaps app/public
-      - run: sentry-cli releases finalize << parameters.project_key >>@${CIRCLE_SHA1}
 
 jobs:
   app-npm-install:
@@ -102,13 +86,17 @@ jobs:
           path: archive.tar.gz
           destination: /home/circleci/project/archive.tar.gz
   app-sentry-release:
-    executor: sentry
-    working_directory: ~/project/app
+    docker:
+      - image: getsentry/sentry-cli:1.40.0
+        environment:
+          SENTRY_ORG: cheattyio
+          SENTRY_PROJECT: cheattyio-api
     steps:
-      - checkout:
-          path: ~/project
-      - sentry-release:
-          project_key: cheattyio-app
+      - attach_workspace:
+          at: ~/project
+      - run: sentry-cli releases new --project ${SENTRY_PROJECT} ${SENTRY_PROJECT}@${CIRCLE_SHA1}
+      - run: sentry-cli releases files ${SENTRY_PROJECT}@${CIRCLE_SHA1} upload-sourcemaps app/public/build
+      - run: sentry-cli releases finalize ${SENTRY_PROJECT}@${CIRCLE_SHA1}
 workflows:
   version: 2
   build:
