@@ -177,7 +177,17 @@ workflows:
           context: sentry
           requires:
             - build-archives
+          filters:
+            branches:
+              only:
+                - develop
+                - main
       - api-sentry-release:
           context: sentry
           requires:
             - build-archives
+          filters:
+            branches:
+              only:
+                - develop
+                - main
