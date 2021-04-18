@@ -1,40 +1,69 @@
 version: 2.1
-jobs:
-  app-build:
-    working_directory: ~/project
+
+executors:
+  node:
     docker:
       - image: circleci/node:15.3.0
+
+commands:
+  npm_install:
+    parameters:
+      cache_key:
+        type: string
+    steps:
+      - restore_cache:
+          keys:
+            - npm-install-<< parameters.cache_key >>-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+            - npm-install-<< parameters.cache_key >>-{{ checksum "package.json" }}
+            - npm-install-<< parameters.cache_key >>
+          paths:
+            - node_modules
+      - run:
+          command: npm install --frozen-lockfile
+      - save_cache:
+          key: npm-install-<< parameters.cache_key >>-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+
+jobs:
+  app-npm-install:
+    executor: node
+    working_directory: ~/project/app
+    steps:
+      - checkout:
+          path: ~/project
+      - npm_install:
+          cache_key: app
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - app/node_modules
+  app-lint:
+    executor: node
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/project
       - run:
-          name: PWD
-          command: "pwd"
+          name: Run linter
+          command: cd app && npm run lint
+  app-validate:
+    executor: node
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
       - run:
-          name: LS
-          working_directory: app
-          command: "ls"
-      - restore_cache:
-          working_directory: app
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          working_directory: app
-          name: Install Dependencies
-          command: npm install
-      - save_cache:
-          working_directory: app
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ./node_modules
-      - run:
-          working_directory: app
-          name: Run Validate
-          command: npm run validate
-      - run:
-          working_directory: app
-          name: Run tests
-          command: npm run test
+          name: Run validate
+          command: cd app && npm run validate
 workflows:
   version: 2
   build:
     jobs:
-      - app-build
+      - app-npm-install
+      - app-lint:
+          requires:
+            - app-npm-install
+      - app-validate:
+          requires:
+            - app-npm-install

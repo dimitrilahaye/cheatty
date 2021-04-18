@@ -6,6 +6,7 @@
     "dev": "rollup -c -w",
     "start": "sirv --no-clear public",
     "lint": "eslint 'src/**/*.{ts,svelte}'",
+    "lint:fix": "eslint 'src/**/*.{ts,svelte}' --fix",
     "validate": "svelte-check",
     "test": "jest src",
     "test:watch": "npm test -- --watch",
