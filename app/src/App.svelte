@@ -9,11 +9,11 @@
   // let handleError = (e) => {
   //   Sentry.captureException(e);
   // }
-  //
+
   Sentry.init({
-    dsn: process.env.SENTRYURL,
+    dsn: process.env.SENTRYURL, // eslint-disable-line no-undef
     integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: process.env.SENTRYTRACES,
+    tracesSampleRate: process.env.SENTRYTRACES, // eslint-disable-line no-undef
   });
 </script>
 

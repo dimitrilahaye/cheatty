@@ -2,9 +2,9 @@
   "name": "cheatty-app",
   "version": "1.0.0",
   "scripts": {
-    "build": "rollup -c",
+    "build": "NODE_ENV=dev rollup -c",
     "build:prod": "NODE_ENV=production rollup -c",
-    "dev": "rollup -c -w",
+    "dev": "NODE_ENV=dev rollup -c -w",
     "start": "sirv --no-clear public",
     "lint": "eslint 'src/**/*.{ts,svelte}'",
     "lint:fix": "eslint 'src/**/*.{ts,svelte}' --fix",
