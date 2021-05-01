@@ -49,28 +49,6 @@
     path: '{{ deploy_helper.new_release_path }}/archive.tar.gz'
     state: absent
 
-
-- name: ls bo
-  find:
-    paths: "{{ cheatty.bo.folder }}/current"
-    patterns: "*"
-    recurse: no
-    file_type: any
-  register: bo_files
-- debug:
-    msg: "{{ [item.path] }} "
-  with_items: "{{ bo_files.files }}"
-- name: ls app
-  find:
-    paths: "{{ cheatty.app.folder }}/current"
-    patterns: "*"
-    recurse: no
-    file_type: any
-  register: app_files
-- debug:
-    msg: "{{ [item.path] }} "
-  with_items: "{{ app_files.files }}"
-
 - name: Run before_finalize commands
   command: '{{ item }}' # noqa 301
   args:
