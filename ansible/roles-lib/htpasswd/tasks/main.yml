@@ -1,0 +1,14 @@
+---
+- name: Install required dependencies
+  apt:
+    name: '{{ (ansible_python_version is version("3.0.0", ">=")) | ternary("python3-passlib", "python-passlib") }}'
+    update_cache: true
+
+- name: Add user to htpasswd
+  htpasswd:
+    path: '{{ htpasswd_path }}'
+    name: '{{ htpasswd_user }}'
+    password: '{{ htpasswd_password }}'
+    owner: '{{ owner | default("root") }}'
+    group: '{{ group | default("www-data") }}'
+    mode: '{{ mode | default(0640) }}'

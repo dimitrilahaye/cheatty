@@ -1,0 +1,15 @@
+---
+database_host: localhost
+database_name: cheatty
+database_user: cheatty
+database_port: 27017
+
+contact: contact@dimitrilahaye.net
+
+cheatty:
+  folder: /var/www/cheatty
+  api:
+    folder: /var/www/cheatty/api
+    port: 3002
+    env:
+      SENTRY_DSN: https://c387f8457a0a406aa3b324c4203b41fe@o554441.ingest.sentry.io/5683174

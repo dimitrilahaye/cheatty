@@ -13,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: environment.server.origin,
+    origin: process.env.ORIGIN || environment.server.origin,
   });
   logger.log(`Accepted requests from origin ${environment.server.origin}`);
 

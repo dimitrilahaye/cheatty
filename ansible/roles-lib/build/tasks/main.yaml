@@ -1,0 +1,34 @@
+---
+- name: Get last commit
+  uri:
+    url: https://api.github.com/repos/{{ repository_name }}/commits?sha={{ branch }}
+    headers:
+      authorization: token {{ github_token }}
+  register: commits
+
+- name: Register last_commit_sha variable
+  set_fact:
+    last_commit_sha: '{{ commits.json[0].sha }}'
+
+- name: Wait for build to finish
+  uri:
+    url: https://circleci.com/api/v1.1/project/github/{{ repository_name }}/tree/{{ branch }}?circle-token={{ circleci_token }}&limit=10&shallow=true
+    headers:
+       accept: application/json
+  register: builds
+  until: builds.json|json_query(query) is not none and (builds.json|json_query(query)).lifecycle == 'finished'
+  retries: 180
+  delay: 10
+  vars:
+    query: '[?vcs_revision==`{{ last_commit_sha }}` && workflows.job_name==`{{ job_name }}`] | [0]'
+
+- name: Register last_build variable
+  set_fact:
+    last_build: '{{ builds.json|json_query(query) }}'
+  vars:
+    query: '[?vcs_revision==`{{ last_commit_sha }}` && workflows.job_name==`{{ job_name }}`] | [0]'
+
+- name: Check that build succeeded
+  fail:
+    msg: Build failed
+  when: last_build.outcome != 'success'

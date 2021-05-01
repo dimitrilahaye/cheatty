@@ -1,0 +1,22 @@
+---
+- name: Add certbot repository
+  apt_repository:
+    repo: 'ppa:certbot/certbot'
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release != "focal"
+
+- name: Install certbot package
+  apt:
+    name: certbot
+    update_cache: yes
+
+- name: Configure certbot
+  template:
+    src: cli.ini.j2
+    dest: /etc/letsencrypt/cli.ini
+    mode: 0644
+
+- name: Get certificates
+  command: certbot certonly --webroot -w {{ item.webroot|quote }} -d {{ item.domain|quote }} --non-interactive
+  args:
+    creates: /etc/letsencrypt/live/{{ item.domain }}
+  with_items: '{{ certificates }}'

@@ -5,16 +5,32 @@ services:
   mongo:
     image: mongo
     restart: always
+    command: mongod --serviceExecutor adaptive
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dimitri-admin
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: cheatty
     ports:
       - 27017:27017
+    volumes:
+      - mongodb_server_data:/data/db
+      - ./docker/mongo-entrypoint/entrypoint.js:/docker-entrypoint-initdb.d/entrypoint.js
 
   mongo-express:
     image: mongo-express
     restart: always
+    depends_on:
+      - "mongo"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: dimitri-admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
     ports:
       - 8081:8081
 
   mailhog:
     image: mailhog/mailhog
     ports:
-      - 8025:8025
+      - 8027:8025
+
+volumes:
+  mongodb_server_data:
