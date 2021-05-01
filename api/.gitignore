@@ -26,5 +26,5 @@ lerna-debug.log*
 .settings/
 *.sublime-workspace
 
-config/development.yml
-config/production.yml
+.env.development
+.env.production
