@@ -1,0 +1,57 @@
+---
+- name: Install nginx package
+  apt:
+    name: nginx
+    update_cache: yes
+
+- name: Add http configuration
+  copy:
+    dest: /etc/nginx/conf.d/http.conf
+    src: http.conf
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: Remove sites configuration
+  file:
+    path: /etc/nginx/sites-available/{{ item.key }}
+    state: absent
+  when: item.value is none
+  loop: '{{ default_sites|combine(sites)|dict2items }}'
+  notify:
+    - reload nginx
+
+- name: Create sites configuration
+  copy:
+    content: '{{ item.value }}'
+    dest: /etc/nginx/sites-available/{{ item.key }}
+    mode: 0644
+  when: item.value is not none
+  loop: '{{ default_sites|combine(sites)|dict2items }}'
+  notify:
+    - reload nginx
+
+- name: Disable sites configuration
+  file:
+    path: /etc/nginx/sites-enabled/{{ item.key }}
+    state: absent
+  when: item.value is none
+  loop: '{{ default_sites|combine(sites)|dict2items }}'
+  notify:
+    - reload nginx
+
+- name: Enable sites configurations
+  file:
+    path: /etc/nginx/sites-enabled/{{ item.key }}
+    state: link
+    src: /etc/nginx/sites-available/{{ item.key }}
+  when: item.value is not none
+  loop: '{{ default_sites|combine(sites)|dict2items }}'
+  notify:
+    - reload nginx
+
+- name: Start nginx service
+  service:
+    name: nginx
+    state: started
+    enabled: true

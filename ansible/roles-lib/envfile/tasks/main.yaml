@@ -1,0 +1,6 @@
+- name: Create env file
+  template:
+    src: envfile.j2
+    dest: '{{ path }}'
+    owner: '{{ owner | default(omit) }}'
+    mode: 0600

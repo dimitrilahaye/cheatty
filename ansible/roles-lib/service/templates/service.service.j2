@@ -1,0 +1,28 @@
+[Unit]
+Description={{ description }}
+After=network.target
+{% for value in requires|default([]) %}
+Requires={{ value }}.service
+{% endfor %}
+
+[Service]
+Type={{ service_type }}
+User={{ user }}
+Group={{ group }}
+{% if working_directory is defined %}
+WorkingDirectory={{ working_directory }}
+{% endif %}
+{% for key, value in env|dictsort %}
+Environment="{{ key }}={{ value|replace('\\', '\\x5c')|replace('"', '\\x22')|replace('%', '%%') }}"
+{% endfor %}
+ExecStart={{ command }}
+{% if exec_stop is defined %}
+ExecStop={{ exec_stop }}
+{% endif %}
+Restart={{ restart_mode }}
+{% if remain_after_exit is defined %}
+RemainAfterExit={{ remain_after_exit }}
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

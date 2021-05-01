@@ -5,7 +5,7 @@ export class AppController {
   @Get()
   healthCheck(): any {
     // test sentry
-    throw new InternalServerErrorException();
+    // throw new InternalServerErrorException();
 
     return {
       uptime: process.uptime(),

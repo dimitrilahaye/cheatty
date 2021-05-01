@@ -1,0 +1,71 @@
+---
+- hosts: main_compute
+  tags:
+    - main_compute
+  tasks:
+    - name: Create cheatty group
+      group:
+        name: cheatty
+        state: present
+    - name: Create cheatty user
+      user:
+        name: cheatty
+        group: cheatty
+        state: present
+
+    - name: Create the required folders
+      tags:
+        - always
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: cheatty
+        group: cheatty
+        mode: 0755
+      loop:
+        - "{{ cheatty.folder }}"
+        - "{{ cheatty.api.folder }}"
+
+    - name: Install gnupg
+      apt:
+        name: gnupg
+    - name: Install node.js, npm and yarn
+      import_role:
+        name: nodejs
+      vars:
+        version: 14
+
+    - name: Add `www-data` to the `cheatty` group
+      user:
+        name: www-data
+        groups: cheatty
+
+    - name: Setup cheatty-api service
+      import_role:
+        name: service
+      vars:
+        service: cheatty-api
+        description: Roadcare API server
+        user: cheatty
+        group: cheatty
+        working_directory: "{{ cheatty.api.folder }}/current"
+        command: /usr/bin/node dist/main
+        env: "{{ cheatty.api.env | combine(cheatty.api.node_env) }}"
+    - name: Setup cheatty-api site
+      import_role:
+        name: site
+      vars:
+        email: "{{ contact }}"
+        site: cheatty-api
+        domain: "{{ cheatty.api.hostname }}"
+        basic_auth_password:
+        config: |
+          location / {
+            client_max_body_size 10G;
+
+            proxy_pass http://localhost:{{ cheatty.api.port }}/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }

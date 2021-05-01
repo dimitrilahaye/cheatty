@@ -1,0 +1,30 @@
+---
+- import_role:
+    name: nginx
+  vars:
+    sites:
+      '{{ site }}-http': '{{ lookup("template", "http.conf.j2") }}'
+
+- meta: flush_handlers
+
+- include_role:
+    name: htpasswd
+  vars:
+    htpasswd_path: /etc/nginx/{{ site }}.htpasswd
+    htpasswd_user: '{{ basic_auth_user|default(site) }}'
+    htpasswd_password: '{{ basic_auth_password }}'
+  when: basic_auth_password is defined and basic_auth_password is not none
+
+- import_role:
+    name: letsencrypt
+  vars:
+    deploy_hook: service nginx reload
+    certificates:
+      - domain: '{{ domain }}'
+        webroot: /var/www/html/
+
+- include_role:
+    name: nginx
+  vars:
+    sites:
+      '{{ site }}-https': '{{ lookup("template", "https.conf.j2") }}'

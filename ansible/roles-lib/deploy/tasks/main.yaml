@@ -1,0 +1,90 @@
+---
+- name: Find the artifact URL
+  uri:
+    url: https://circleci.com/api/v1.1/project/github/{{ repository_name }}/{{ last_build.build_num }}/artifacts?circle-token={{ circleci_token }}
+    headers:
+       accept: application/json
+  register: artifacts
+
+- name: Register artifact_url variable
+  set_fact:
+    artifact_url: '{{ artifacts.json|json_query(query) }}'
+  vars:
+    query: '[?path==`{{ (artifact_path is defined) | ternary(artifact_path, "home/circleci/project/" ~ artifact|default("")) }}`].url | [0]'
+
+- name: Check that the artifact was found
+  fail:
+    msg: 'Specified artifact could not be found: {{ artifact }}'
+  when: (artifact_url | length) == 0
+
+- name: Initialize the deploy
+  deploy_helper:
+    path: '{{ path }}'
+
+- name: Create release directory
+  file:
+    path: '{{ deploy_helper.new_release_path }}'
+    state: directory
+    mode: 0755
+
+- name: Add an unfinished file
+  file:
+    path: '{{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}'
+    state: touch
+    mode: 0644
+
+- name: Download the archive
+  get_url:
+    url: '{{ artifact_url }}?circle-token={{ circleci_token }}'
+    dest: '{{ deploy_helper.new_release_path }}/archive.tar.gz'
+
+- name: Extract the archive
+  unarchive: # noqa 208
+    remote_src: true
+    src: '{{ deploy_helper.new_release_path }}/archive.tar.gz'
+    dest: '{{ deploy_helper.new_release_path }}'
+
+- name: Remove the archive
+  file:
+    path: '{{ deploy_helper.new_release_path }}/archive.tar.gz'
+    state: absent
+
+
+- name: ls bo
+  find:
+    paths: "{{ cheatty.bo.folder }}/current"
+    patterns: "*"
+    recurse: no
+    file_type: any
+  register: bo_files
+- debug:
+    msg: "{{ [item.path] }} "
+  with_items: "{{ bo_files.files }}"
+- name: ls app
+  find:
+    paths: "{{ cheatty.app.folder }}/current"
+    patterns: "*"
+    recurse: no
+    file_type: any
+  register: app_files
+- debug:
+    msg: "{{ [item.path] }} "
+  with_items: "{{ app_files.files }}"
+
+- name: Run before_finalize commands
+  command: '{{ item }}' # noqa 301
+  args:
+    chdir: '{{ deploy_helper.new_release_path }}'
+  with_items: '{{ before_finalize|default([]) }}'
+
+- name: Finalize the deploy
+  deploy_helper:
+    path: '{{ deploy_helper.project_path }}'
+    release: '{{ deploy_helper.new_release }}'
+    state: finalize
+
+- name: Run after_finalize commands
+  command: '{{ item }}' # noqa 301
+  args:
+    chdir: '{{ deploy_helper.new_release_path }}'
+  with_items: '{{ after_finalize|default([]) }}'

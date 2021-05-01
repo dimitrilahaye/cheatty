@@ -1,0 +1,21 @@
+---
+- name: Install https APT transport
+  apt:
+    name: apt-transport-https
+    update_cache: true
+
+- name: Add NodeJS APT key
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+
+- name: Add NodeJS APT repo
+  apt_repository:
+    repo: deb https://deb.nodesource.com/node_{{ version }}.x {{ ansible_distribution_release }} main
+    state: present
+    filename: nodesource
+
+- name: Install NodeJS
+  apt:
+    name: nodejs
+    update_cache: true
