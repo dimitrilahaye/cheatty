@@ -8,14 +8,15 @@ import { SentryInterceptor } from './interceptors/sentry.interceptor';
 
 async function bootstrap() {
   const SENTRY = process.env.SENTRY || environment.sentry.url;
+  const ORIGIN = process.env.ORIGIN || environment.server.origin;
   const logger = new Logger('bootstrap');
 
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: process.env.ORIGIN || environment.server.origin,
+    origin: ORIGIN,
   });
-  logger.log(`Accepted requests from origin ${environment.server.origin}`);
+  logger.log(`Accepted requests from origin ${ORIGIN}`);
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new SentryInterceptor());
