@@ -50,7 +50,7 @@
         group: cheatty
         working_directory: "{{ cheatty.api.folder }}/current"
         command: /usr/bin/node dist/main
-        env: "{{ cheatty.api.env | combine(cheatty.api.node_env) }}"
+        env: "{{ cheatty.api.node_env }}"
     - name: Setup cheatty-api site
       import_role:
         name: site
