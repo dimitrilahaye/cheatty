@@ -17,6 +17,7 @@ import { AppResolver } from './app.resolver';
         process.env.DATABASE
       }?retryWrites=true&w=majority`,
       synchronize: true,
+      useNewUrlParser: true,
       useUnifiedTopology: true,
       entities: [],
     }),
