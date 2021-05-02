@@ -61,8 +61,6 @@
         basic_auth_password:
         config: |
           location / {
-            client_max_body_size 10G;
-
             proxy_pass http://localhost:{{ cheatty.api.port }}/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
