@@ -16,7 +16,7 @@ cheatty:
   api:
     hostname: 05c7dac4-daff-49cc-9993-a711d8b175cf.pub.instances.scw.cloud
     node_env:
-      PRODUCTION: true
+      PRODUCTION: 'true'
       USERNAME: dimitri-admin
       PASSWORD: !vault |
         $ANSIBLE_VAULT;1.1;AES256
@@ -30,3 +30,5 @@ cheatty:
       SENTRY: https://c387f8457a0a406aa3b324c4203b41fe@o554441.ingest.sentry.io/5683174
       PORT: 3002
       ORIGIN: https://9af7e799-2c1c-4e05-97ae-3904379ef518.pub.instances.scw.cloud
+      TRACES: '1.0'
+      DB_PORT: 27017
