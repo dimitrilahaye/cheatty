@@ -22,3 +22,11 @@ cheatty:
       ORIGIN: https://9af7e799-2c1c-4e05-97ae-3904379ef518.pub.instances.scw.cloud
       TRACES: '1.0'
       DB_PORT: 27017
+  app:
+    hostname: 9af7e799-2c1c-4e05-97ae-3904379ef518.pub.instances.scw.cloud
+    node_env:
+      PRODUCTION: 'true'
+      API: https://05c7dac4-daff-49cc-9993-a711d8b175cf.pub.instances.scw.cloud:3002
+      SENTRYURL: https://6cebdab6517647d5a3e34ab924160fab@o554441.ingest.sentry.io/5683154
+      SENTRYTRACES: '1.0'
+
