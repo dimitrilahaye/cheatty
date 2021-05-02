@@ -25,6 +25,7 @@
       loop:
         - "{{ cheatty.folder }}"
         - "{{ cheatty.api.folder }}"
+        - "{{ cheatty.app.folder }}"
 
     - name: Install gnupg
       apt:
@@ -62,6 +63,34 @@
         config: |
           location / {
             proxy_pass http://localhost:{{ cheatty.api.port }}/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }
+
+    - name: Setup cheatty-app service
+      import_role:
+        name: service
+      vars:
+        service: cheatty-app
+        description: Cheatty APP server
+        user: cheatty
+        group: cheatty
+        working_directory: "{{ cheatty.app.folder }}/current"
+        command: ./node_modules/rollup/dist/bin/rollup  -c -w
+        env: "{{ cheatty.app.node_env }}"
+    - name: Setup cheatty-app site
+      import_role:
+        name: site
+      vars:
+        email: "{{ contact }}"
+        site: cheatty-app
+        domain: "{{ cheatty.app.hostname }}"
+        basic_auth_password:
+        config: |
+          location / {
+            proxy_pass http://localhost:{{ cheatty.app.port }}/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

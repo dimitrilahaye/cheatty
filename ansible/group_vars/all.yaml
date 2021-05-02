@@ -6,3 +6,6 @@ cheatty:
   api:
     folder: /var/www/cheatty/api
     port: 3002
+  app:
+    folder: /var/www/cheatty/app
+    port: 5000
