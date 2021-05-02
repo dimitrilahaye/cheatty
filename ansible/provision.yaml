@@ -45,7 +45,7 @@
         name: service
       vars:
         service: cheatty-api
-        description: Roadcare API server
+        description: Cheatty API server
         user: cheatty
         group: cheatty
         working_directory: "{{ cheatty.api.folder }}/current"
