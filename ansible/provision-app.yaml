@@ -58,10 +58,8 @@
         email: "{{ contact }}"
         site: cheatty-app
         domain: "{{ cheatty.app.hostname }}"
-        basic_auth_user: "{{ cheatty.app.basic_auth_user }}"
-        basic_auth_password: "{{ cheatty.app.basic_auth_password }}"
         config: |
-          root {{ cheatty.app.folder }}/current;
+          root {{ cheatty.app.folder }}/current/public;
           index index.html;
 
           location ~* \.(?:manifest|appcache|html?|xml|json)$ {
