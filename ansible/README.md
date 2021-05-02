@@ -1,7 +1,7 @@
 # Provisionning
 
-`ansible-playbook -i staging provision.yaml`
+`./provision.sh (app|api) (staging|production)`
 
 # Deployment
 
-`ansible-playbook -i staging deployment.yaml`
+`./deploy.sh (app|api) (staging|production)`
