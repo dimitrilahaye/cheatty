@@ -1,0 +1,84 @@
+---
+- hosts: main_compute
+  tags:
+    - main_compute
+  tasks:
+    - name: Create cheatty group
+      group:
+        name: cheatty
+        state: present
+    - name: Create cheatty user
+      user:
+        name: cheatty
+        group: cheatty
+        state: present
+
+    - name: Create the required folders
+      tags:
+        - always
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: cheatty
+        group: cheatty
+        mode: 0755
+      loop:
+        - "{{ cheatty.folder }}"
+        - "{{ cheatty.app.folder }}"
+
+    - name: Install gnupg
+      apt:
+        name: gnupg
+    - name: Install node.js, npm and yarn
+      import_role:
+        name: nodejs
+      vars:
+        version: 14
+
+    - name: Add `www-data` to the `cheatty` group
+      user:
+        name: www-data
+        groups: cheatty
+
+    - name: Setup cheatty-app service
+      import_role:
+        name: service
+      vars:
+        service: cheatty-app
+        description: Cheatty APP server
+        user: cheatty
+        group: cheatty
+        working_directory: "{{ cheatty.app.folder }}/current"
+        command: "{{ cheatty.app.folder }}/current/node_modules/rollup/dist/bin/rollup -c -w"
+        env: "{{ cheatty.app.node_env }}"
+    - name: Setup cheatty-app site
+      import_role:
+        name: site
+      vars:
+        email: "{{ contact }}"
+        site: cheatty-app
+        domain: "{{ cheatty.app.hostname }}"
+        basic_auth_user: "{{ cheatty.app.basic_auth_user }}"
+        basic_auth_password: "{{ cheatty.app.basic_auth_password }}"
+        config: |
+          root {{ cheatty.app.folder }}/current;
+          index index.html;
+
+          location ~* \.(?:manifest|appcache|html?|xml|json)$ {
+            expires -1;
+          }
+
+          location ~* \.(?:css|js)$ {
+            try_files $uri =404;
+            expires 1y;
+            access_log off;
+            add_header Cache-Control "public";
+          }
+
+          location ~ ^.+\..+$ {
+            try_files $uri =404;
+          }
+
+          location / {
+            try_files $uri $uri/ /index.html;
+          }
