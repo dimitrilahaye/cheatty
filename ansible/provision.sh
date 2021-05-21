@@ -1,13 +1,11 @@
 #!/bin/bash
 
 PROJECT=$1
-ENVIRONMENT=$2
-
-INVENTORY="${ENVIRONMENT}-${PROJECT}"
+INVENTORY=$2
 
 PLAYBOOK="provision-${PROJECT}.yaml"
 
-if [ "$ENVIRONMENT" != "staging" ] && [ "$ENVIRONMENT" != "production" ]; then
+if [ "$INVENTORY" != "staging" ] && [ "$INVENTORY" != "production" ]; then
     echo "Invalid environment (staging | production)"
 
     exit 1
@@ -19,4 +17,4 @@ if [ "$PROJECT" != "app" ] && [ "$PROJECT" != "api" ]; then
     exit 1
 fi
 
-ansible-playbook -i $INVENTORY $PLAYBOOK
+ansible-playbook -i $INVENTORY -l $PROJECT $PLAYBOOK

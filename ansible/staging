@@ -1,0 +1,7 @@
+[api]
+main_compute ansible_host=51.15.223.222 ansible_user=debian ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_python_interpreter=python3
+[app]
+main_compute ansible_host=212.47.249.82 ansible_user=debian ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_python_interpreter=python3
+[staging:children]
+api
+app
