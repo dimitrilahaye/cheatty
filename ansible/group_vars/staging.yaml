@@ -3,7 +3,8 @@ branch: develop
 
 cheatty:
   api:
-    hostname: 05c7dac4-daff-49cc-9993-a711d8b175cf.pub.instances.scw.cloud
+    hostname: cheatty.staging.api.dimitrilahaye.net
+    #hostname: 05c7dac4-daff-49cc-9993-a711d8b175cf.pub.instances.scw.cloud
     node_env:
       PRODUCTION: 'true'
       USERNAME: dimitri-admin
@@ -22,7 +23,16 @@ cheatty:
       TRACES: '1.0'
       DB_PORT: 27017
   app:
-    hostname: 9af7e799-2c1c-4e05-97ae-3904379ef518.pub.instances.scw.cloud
+    hostname: cheatty.staging.dimitrilahaye.net
+    #hostname: 9af7e799-2c1c-4e05-97ae-3904379ef518.pub.instances.scw.cloud
+    basic_auth_user: cheatty
+    basic_auth_password: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      62346132386635623737396466366436393631313632636533643565653731383134613163636466
+      6237373230613230303264333138626139373039336431320a386165313662323464383466396630
+      31323235376261333966623261383663613335333132626130326465376133306336623134343932
+      6339333732393634610a663133333437376139656436646238613965353933316564383930303637
+      65616163303361306135663664393435336161343732393031356135383335313161
     node_env:
       PRODUCTION: 'true'
       API: https://05c7dac4-daff-49cc-9993-a711d8b175cf.pub.instances.scw.cloud:3002
