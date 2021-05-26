@@ -7,13 +7,13 @@ import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
 import replace from '@rollup/plugin-replace';
-import { config } from 'dotenv';
+// import { config } from 'dotenv';
 
 const production = process.env.NODE_ENV === 'production' || process.env.PRODUCTION;
 
-if (!production) {
-  config();
-}
+// if (!production) {
+//   config();
+// }
 
 function serve() {
   let server;

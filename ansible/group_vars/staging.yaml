@@ -2,6 +2,7 @@
 branch: develop
 
 cheatty:
+  hostname: cheatty.staging.dimitrilahaye.net
   api:
     hostname: cheatty.staging.api.dimitrilahaye.net
     #hostname: 05c7dac4-daff-49cc-9993-a711d8b175cf.pub.instances.scw.cloud

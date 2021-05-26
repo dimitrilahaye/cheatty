@@ -44,11 +44,9 @@
       vars:
         email: "{{ contact }}"
         site: cheatty-api
-        domain: "{{ cheatty.api.hostname }}"
+        domain: "{{ cheatty.hostname }}"
         config: |
-          root {{ cheatty.api.folder }}/current/dist/main.js;
-
-          location / {
+          location /api/ {
             proxy_pass http://localhost:{{ cheatty.api.port }}/;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -107,7 +105,7 @@
         site: cheatty-app
         basic_auth_user: "{{ cheatty.app.basic_auth_user }}"
         basic_auth_password: "{{ cheatty.app.basic_auth_password }}"
-        domain: "{{ cheatty.app.hostname }}"
+        domain: "{{ cheatty.hostname }}"
         config: |
           root {{ cheatty.app.folder }}/current/public;
           index index.html;
