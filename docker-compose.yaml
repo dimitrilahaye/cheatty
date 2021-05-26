@@ -64,7 +64,7 @@ services:
       API: "http://localhost:3002"
       SENTRYURL: "https://6cebdab6517647d5a3e34ab924160fab@o554441.ingest.sentry.io/5683154"
       SENTRYTRACES: 1.0
-      HOST: '0.0.0.0'
+      HOST: '0.0.0.0' # https://github.com/lukeed/sirv/issues/29#issuecomment-497907602
 
   mailhog:
     image: mailhog/mailhog
