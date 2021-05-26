@@ -52,11 +52,9 @@
 
     - import_role:
         name: deploy
-      environment: "{{ cheatty.api.node_env }}"
+      environment: "{{ cheatty.app.node_env }}"
       tags:
         - app
       vars:
         path: "{{ cheatty.app.folder }}"
         artifact: app.tar.gz
-        after_finalize:
-          - systemctl restart cheatty-app

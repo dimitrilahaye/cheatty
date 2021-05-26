@@ -4,8 +4,6 @@ branch: refacto-ansible
 cheatty:
   hostname: cheatty.staging.dimitrilahaye.net
   api:
-    hostname: cheatty.staging.api.dimitrilahaye.net
-    #hostname: 05c7dac4-daff-49cc-9993-a711d8b175cf.pub.instances.scw.cloud
     node_env:
       PRODUCTION: 'true'
       USERNAME: dimitri-admin
@@ -20,12 +18,9 @@ cheatty:
       DATABASE: cheatty
       SENTRY: https://c387f8457a0a406aa3b324c4203b41fe@o554441.ingest.sentry.io/5683174
       PORT: 3002
-      ORIGIN: https://9af7e799-2c1c-4e05-97ae-3904379ef518.pub.instances.scw.cloud
       TRACES: '1.0'
       DB_PORT: 27017
   app:
-    hostname: cheatty.staging.dimitrilahaye.net
-    #hostname: 9af7e799-2c1c-4e05-97ae-3904379ef518.pub.instances.scw.cloud
     basic_auth_user: cheatty
     basic_auth_password: !vault |
       $ANSIBLE_VAULT;1.1;AES256
@@ -36,6 +31,6 @@ cheatty:
       65616163303361306135663664393435336161343732393031356135383335313161
     node_env:
       PRODUCTION: 'true'
-      API: cheatty.staging.api.dimitrilahaye.net:3002
+      API: https://cheatty.staging.dimitrilahaye.net/api/
       SENTRYURL: https://6cebdab6517647d5a3e34ab924160fab@o554441.ingest.sentry.io/5683154
       SENTRYTRACES: '1.0'

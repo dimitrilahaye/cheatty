@@ -47,18 +47,6 @@
         command: /usr/bin/node dist/main
         env: "{{ cheatty.api.node_env }}"
 
-    - name: Setup cheatty-app service
-      import_role:
-        name: service
-      vars:
-        service: cheatty-app
-        description: Cheatty APP server
-        user: cheatty
-        group: cheatty
-        working_directory: "{{ cheatty.app.folder }}/current"
-        command: "{{ cheatty.app.folder }}/current/node_modules/rollup/dist/bin/rollup -c -w"
-        env: "{{ cheatty.app.node_env }}"
-
     - name: Setup cheatty site
       import_role:
         name: site

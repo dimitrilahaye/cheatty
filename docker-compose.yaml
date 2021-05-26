@@ -44,7 +44,6 @@ services:
       - ./api:/usr/src/project/api
     environment:
       PORT: '3002'
-      ORIGIN: 'http://localhost:5000'
       SENTRY: 'https://c387f8457a0a406aa3b324c4203b41fe@o554441.ingest.sentry.io/5683174'
       TRACES: '1.0'
       TYPE: 'mongodb'
