@@ -1,68 +1,21 @@
 ---
 - hosts: cheatty
-  tags:
-    - api
   tasks:
-    - name: Create cheatty group
+    - name: Create cheatty api group
       group:
         name: cheatty-api
         state: present
-    - name: Create cheatty user
+    - name: Create cheatty api user
       user:
         name: cheatty-api
         group: cheatty-api
         state: present
 
-    - name: Create the required folders
-      tags:
-        - always
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: cheatty
-        group: cheatty
-        mode: 0755
-      loop:
-        - "{{ cheatty.folder }}"
-        - "{{ cheatty.api.folder }}"
-
-    - name: Setup cheatty-api service
-      import_role:
-        name: service
-      vars:
-        service: cheatty-api
-        description: Cheatty API server
-        user: cheatty
-        group: cheatty
-        working_directory: "{{ cheatty.api.folder }}/current"
-        command: /usr/bin/node dist/main
-        env: "{{ cheatty.api.node_env }}"
-
-    - name: Setup cheatty-api site
-      import_role:
-        name: site
-      vars:
-        email: "{{ contact }}"
-        site: cheatty-api
-        domain: "{{ cheatty.hostname }}"
-        config: |
-          location /api/ {
-            proxy_pass http://localhost:{{ cheatty.api.port }}/;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-          }
-
-- hosts: cheatty
-  tags:
-    - app
-  tasks:
-    - name: Create cheatty group
+    - name: Create cheatty app group
       group:
         name: cheatty-app
         state: present
-    - name: Create cheatty user
+    - name: Create cheatty app user
       user:
         name: cheatty-app
         group: cheatty-app
@@ -78,12 +31,21 @@
         group: cheatty
         mode: 0755
       loop:
+        - "{{ cheatty.folder }}"
+        - "{{ cheatty.api.folder }}"
         - "{{ cheatty.app.folder }}"
 
-    - name: Add `www-data` to the `cheatty` group
-      user:
-        name: www-data
-        groups: cheatty
+    - name: Setup cheatty-api service
+      import_role:
+        name: service
+      vars:
+        service: cheatty-api
+        description: Cheatty API server
+        user: cheatty
+        group: cheatty
+        working_directory: "{{ cheatty.api.folder }}/current"
+        command: /usr/bin/node dist/main
+        env: "{{ cheatty.api.node_env }}"
 
     - name: Setup cheatty-app service
       import_role:
@@ -97,34 +59,27 @@
         command: "{{ cheatty.app.folder }}/current/node_modules/rollup/dist/bin/rollup -c -w"
         env: "{{ cheatty.app.node_env }}"
 
-    - name: Setup cheatty-app site
+    - name: Setup cheatty site
       import_role:
         name: site
       vars:
         email: "{{ contact }}"
-        site: cheatty-app
+        site: cheatty
         basic_auth_user: "{{ cheatty.app.basic_auth_user }}"
         basic_auth_password: "{{ cheatty.app.basic_auth_password }}"
         domain: "{{ cheatty.hostname }}"
         config: |
           root {{ cheatty.app.folder }}/current/public;
-          index index.html;
-
-          location ~* \.(?:manifest|appcache|html?|xml|json)$ {
-            expires -1;
-          }
-
-          location ~* \.(?:css|js)$ {
-            try_files $uri =404;
-            expires 1y;
-            access_log off;
-            add_header Cache-Control "public";
-          }
-
-          location ~ ^.+\..+$ {
-            try_files $uri =404;
-          }
 
           location / {
-            try_files $uri $uri/ /index.html;
+              try_files $uri /index.html;
+              add_header cache-control "no-store";
+          }
+
+          location /api/ {
+            proxy_pass http://localhost:{{ cheatty.api.port }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
           }
