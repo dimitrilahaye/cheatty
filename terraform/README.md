@@ -13,10 +13,8 @@ By this way, we conserve the DNS redirection used for the staging.
 ## Terraform CLI
 
 ```bash
-# init terraform folder
+# init terraform working directory
 terraform init -var-file="staging.tfvars"
-# plan terraform instance
-terraform plan -var-file="staging.tfvars"
 # create scaleway instance
 terraform apply -var-file="staging.tfvars"
 # destroy scaleway instance
