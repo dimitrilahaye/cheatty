@@ -1,24 +1,14 @@
 ---
 - hosts: cheatty
   tasks:
-    - name: Create cheatty api group
+    - name: Create cheatty group
       group:
-        name: cheatty-api
+        name: cheatty
         state: present
     - name: Create cheatty api user
       user:
-        name: cheatty-api
-        group: cheatty-api
-        state: present
-
-    - name: Create cheatty app group
-      group:
-        name: cheatty-app
-        state: present
-    - name: Create cheatty app user
-      user:
-        name: cheatty-app
-        group: cheatty-app
+        name: cheatty
+        group: cheatty
         state: present
 
     - name: Create the required folders
@@ -35,7 +25,18 @@
         - "{{ cheatty.api.folder }}"
         - "{{ cheatty.app.folder }}"
 
-    - name: Setup cheatty-api service
+    - name: Install node.js and npm
+      import_role:
+        name: nodejs
+      vars:
+        version: 14
+
+    - name: Add `www-data` to the `cheatty` group
+      user:
+        name: www-data
+        groups: cheatty
+
+    - name: Setup cheatty service
       import_role:
         name: service
       vars:

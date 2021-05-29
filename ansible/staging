@@ -1,2 +1,2 @@
 [staging]
-cheatty ansible_host=51.15.223.222 ansible_user=debian ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_python_interpreter=python3
+cheatty ansible_host=51.159.174.68 ansible_user=debian ansible_become=true ansible_become_method=sudo ansible_become_user=root ansible_python_interpreter=python3
