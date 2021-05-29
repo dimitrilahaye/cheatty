@@ -1,5 +1,5 @@
 ---
-branch: develop
+branch: refacto-ansibe
 
 cheatty:
   hostname: cheatty.staging.dimitrilahaye.net
