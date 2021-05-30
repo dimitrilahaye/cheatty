@@ -3,12 +3,12 @@
   tasks:
     - name: Create cheatty group
       group:
-        name: cheatty
+        name: "{{ cheatty.group }}"
         state: present
     - name: Create cheatty api user
       user:
-        name: cheatty
-        group: cheatty
+        name: "{{ cheatty.user }}"
+        group: "{{ cheatty.group }}"
         state: present
 
     - name: Create the required folders
@@ -17,8 +17,8 @@
       file:
         path: "{{ item }}"
         state: directory
-        owner: cheatty
-        group: cheatty
+        owner: "{{ cheatty.group }}"
+        group: "{{ cheatty.group }}"
         mode: 0755
       loop:
         - "{{ cheatty.folder }}"
@@ -34,7 +34,7 @@
     - name: Add `www-data` to the `cheatty` group
       user:
         name: www-data
-        groups: cheatty
+        groups: "{{ cheatty.group }}"
 
     - name: Setup cheatty service
       import_role:
@@ -42,8 +42,8 @@
       vars:
         service: cheatty-api
         description: Cheatty API server
-        user: cheatty
-        group: cheatty
+        user: "{{ cheatty.user }}"
+        group: "{{ cheatty.group }}"
         working_directory: "{{ cheatty.api.folder }}/current"
         command: /usr/bin/node dist/main
         env: "{{ cheatty.api.node_env }}"

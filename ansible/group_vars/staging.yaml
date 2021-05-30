@@ -1,5 +1,5 @@
 ---
-branch: develop
+branch: refacto-ansible
 
 cheatty:
   hostname: cheatty.staging.dimitrilahaye.net
