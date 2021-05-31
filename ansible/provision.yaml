@@ -1,0 +1,74 @@
+---
+- hosts: cheatty
+  tasks:
+    - name: Create cheatty group
+      group:
+        name: "{{ cheatty.group }}"
+        state: present
+    - name: Create cheatty api user
+      user:
+        name: "{{ cheatty.user }}"
+        group: "{{ cheatty.group }}"
+        state: present
+
+    - name: Create the required folders
+      tags:
+        - always
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ cheatty.group }}"
+        group: "{{ cheatty.group }}"
+        mode: 0755
+      loop:
+        - "{{ cheatty.folder }}"
+        - "{{ cheatty.api.folder }}"
+        - "{{ cheatty.app.folder }}"
+
+    - name: Install node.js and npm
+      import_role:
+        name: nodejs
+      vars:
+        version: 14
+
+    - name: Add `www-data` to the `cheatty` group
+      user:
+        name: www-data
+        groups: "{{ cheatty.group }}"
+
+    - name: Setup cheatty service
+      import_role:
+        name: service
+      vars:
+        service: cheatty-api
+        description: Cheatty API server
+        user: "{{ cheatty.user }}"
+        group: "{{ cheatty.group }}"
+        working_directory: "{{ cheatty.api.folder }}/current"
+        command: /usr/bin/node dist/main
+        env: "{{ cheatty.api.node_env }}"
+
+    - name: Setup cheatty site
+      import_role:
+        name: site
+      vars:
+        email: "{{ contact }}"
+        site: cheatty
+        basic_auth_user: "{{ cheatty.app.basic_auth_user }}"
+        basic_auth_password: "{{ cheatty.app.basic_auth_password }}"
+        domain: "{{ cheatty.hostname }}"
+        config: |
+          root {{ cheatty.app.folder }}/current/public;
+
+          location / {
+              try_files $uri /index.html;
+              add_header cache-control "no-store";
+          }
+
+          location /api/ {
+            proxy_pass http://localhost:{{ cheatty.api.port }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          }

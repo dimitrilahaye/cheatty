@@ -1,0 +1,4 @@
+access_key  = "<access_key>"
+secret_key  = "<secret_key>"
+project_id  = "<project_id>"
+ip_id       = "<ip_id>"

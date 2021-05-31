@@ -1,7 +1,7 @@
 # Provisionning
 
-`./provision.sh (app|api) (staging|production)`
+`./provision.sh (staging|production)`
 
 # Deployment
 
-`./deploy.sh (app|api) (staging|production)`
+`./deploy.sh (staging|production)`
