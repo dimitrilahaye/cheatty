@@ -58,3 +58,5 @@
       vars:
         path: "{{ cheatty.app.folder }}"
         artifact: app.tar.gz
+        after_finalize:
+          - systemctl restart cheatty-app

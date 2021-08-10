@@ -31,6 +31,7 @@ cheatty:
       65616163303361306135663664393435336161343732393031356135383335313161
     node_env:
       PRODUCTION: 'true'
+      NODE_ENV: 'production'
       API: https://cheatty.staging.dimitrilahaye.net/api/
       SENTRYURL: https://6cebdab6517647d5a3e34ab924160fab@o554441.ingest.sentry.io/5683154
       SENTRYTRACES: '1.0'
