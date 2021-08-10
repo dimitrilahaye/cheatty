@@ -86,11 +86,11 @@ jobs:
           at: ~/project
       - run:
           name: Build
-          command: cd app && npm run build:prod
+          command: cd app && npm run build
       - persist_to_workspace:
           root: ~/project
           paths:
-            - app/public
+            - app/build
   api-build:
     executor: node
     steps:
@@ -120,7 +120,7 @@ jobs:
       - run:
           name: Create app archive
           command: |
-            tar -czf archive.tar.gz ./package.json ./node_modules ./public
+            tar -czf archive.tar.gz ./package.json ./node_modules ./build
           working_directory: ~/project/app
       - store_artifacts:
           path: app/archive.tar.gz
