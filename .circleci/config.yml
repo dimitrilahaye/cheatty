@@ -90,7 +90,7 @@ jobs:
       - persist_to_workspace:
           root: ~/project
           paths:
-            - app/public
+            - app/build
   api-build:
     executor: node
     steps:
