@@ -7,6 +7,8 @@
 	import { Integrations } from '@sentry/tracing';
 	import type { Exception } from '@sentry/browser';
 
+	console.info(env.SENTRYURL);
+
 	Sentry.init({
 		dsn: String(env.SENTRYURL),
 		integrations: [new Integrations.BrowserTracing()],
