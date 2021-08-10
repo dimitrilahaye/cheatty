@@ -36,7 +36,7 @@
         name: www-data
         groups: "{{ cheatty.group }}"
 
-    - name: Setup cheatty service
+    - name: Setup cheatty api service
       import_role:
         name: service
       vars:
@@ -48,6 +48,18 @@
         command: /usr/bin/node dist/main
         env: "{{ cheatty.api.node_env }}"
 
+    - name: Setup cheatty app service
+      import_role:
+        name: service
+      vars:
+        service: cheatty-app
+        description: Cheatty APP server
+        user: "{{ cheatty.user }}"
+        group: "{{ cheatty.group }}"
+        working_directory: "{{ cheatty.app.folder }}/current"
+        command: /usr/bin/node build/index.js
+        env: "{{ cheatty.app.node_env }}"
+
     - name: Setup cheatty site
       import_role:
         name: site
@@ -58,10 +70,10 @@
         basic_auth_password: "{{ cheatty.app.basic_auth_password }}"
         domain: "{{ cheatty.hostname }}"
         config: |
-          root {{ cheatty.app.folder }}/current/public;
+          root {{ cheatty.app.folder }}/current/build;
 
           location / {
-              try_files $uri /index.html;
+              proxy_pass http://localhost:{{ cheatty.app.port }};
               add_header cache-control "no-store";
           }
 
