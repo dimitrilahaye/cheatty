@@ -27,5 +27,6 @@
 			"$lib/*": ["src/lib/*"]
 		}
 	},
+	"extends": "@tsconfig/svelte/tsconfig.json",
 	"include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"]
 }
