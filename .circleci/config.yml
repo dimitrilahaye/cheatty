@@ -35,10 +35,10 @@ commands:
           name: Set env file
           command: |
             cd app &&
-            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.${ENV} &&
-            echo $'VITE_API=${VITE_API}\n' > .env.${ENV} &&
-            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.${ENV} &&
-            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.${ENV}
+            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.$ENV &&
+            echo $'VITE_API=${VITE_API}\n' > .env.$ENV &&
+            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.$ENV &&
+            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.$ENV
 
   build_archives:
       steps:
