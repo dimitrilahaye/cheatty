@@ -101,7 +101,6 @@ jobs:
   app-build:
     executor: node
     steps:
-      - env/attach-env
       - checkout:
           path: ~/project
       - attach_workspace:
