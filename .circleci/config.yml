@@ -25,6 +25,22 @@ commands:
           paths:
             - node_modules
 
+  app-set-env-file:
+    executor: node
+    steps:
+      - checkout:
+          path: ~/project
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Set env file
+          command: |
+            cd app &&
+            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.${ENV} &&
+            echo $'VITE_API=${VITE_API}\n' > .env.${ENV} &&
+            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.${ENV} &&
+            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.${ENV}
+
 jobs:
   app-npm-install:
     executor: node
@@ -82,21 +98,17 @@ jobs:
           name: Run validate
           command: cd app && npm run validate
 
-  app-set-env-file:
+  app-set-env-file-staging:
     executor: node
+    context: cheatty-staging
     steps:
-      - checkout:
-          path: ~/project
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: Set env file
-          command: |
-            cd app &&
-            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.${ENV} &&
-            echo $'VITE_API=${VITE_API}\n' > .env.${ENV} &&
-            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.${ENV} &&
-            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.${ENV}
+      - app-set-env-file
+
+  app-set-env-file-prod:
+    executor: node
+    context: cheatty-production
+    steps:
+      - app-set-env-file
 
   app-build:
     executor: node
@@ -198,18 +210,14 @@ workflows:
       - app-validate:
           requires:
             - app-npm-install
-      - app-set-env-file:
-          name: staging
-          context: cheatty-staging
+      - app-set-env-file-staging:
           requires:
             - app-npm-install
           filters:
             branches:
               only:
                 - develop
-      - app-set-env-file:
-          name: production
-          context: cheatty-production
+      - app-set-env-file-prod:
           requires:
             - app-npm-install
           filters:
@@ -218,7 +226,7 @@ workflows:
                 - main
       - app-build:
           requires:
-            - app-set-env-file
+            - app-npm-install
       - api-build:
           requires:
             - api-lint
