@@ -26,19 +26,18 @@ commands:
             - node_modules
 
   app_set_env_file:
+    parameters:
+      env:
+        type: string
     steps:
-      - checkout:
-          path: ~/project
-      - attach_workspace:
-          at: ~/project
       - run:
-          name: Set env file
+          name: Set env file for env << parameters.env >>
           command: |
             cd app &&
-            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.${ENV} &&
-            echo $'VITE_API=${VITE_API}\n' > .env.${ENV} &&
-            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.${ENV} &&
-            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.${ENV}
+            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.<< parameters.env >> &&
+            echo $'VITE_API=${VITE_API}\n' > .env.<< parameters.env >> &&
+            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.<< parameters.env >> &&
+            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.<< parameters.env >>
 
 jobs:
   app-npm-install:
@@ -100,12 +99,22 @@ jobs:
   app-set-env-file-staging:
     executor: node
     steps:
-      - app_set_env_file
+      - checkout:
+          path: ~/project
+      - attach_workspace:
+          at: ~/project
+      - app_set_env_file:
+          env: staging
 
   app-set-env-file-prod:
     executor: node
     steps:
-      - app_set_env_file
+      - checkout:
+          path: ~/project
+      - attach_workspace:
+          at: ~/project
+      - app_set_env_file:
+          env: production
 
   app-build:
     executor: node
