@@ -35,10 +35,13 @@ commands:
           name: Set env file
           command: |
             cd app &&
-            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.$ENV &&
-            echo $'VITE_API=${VITE_API}\n' > .env.$ENV &&
-            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.$ENV &&
-            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.$ENV
+            echo 'VITE_NODE_ENV=${VITE_NODE_ENV}' > .env.$ENV &&
+            echo >> .env.$ENV &&
+            echo 'VITE_API=${VITE_API}' >> .env.$ENV &&
+            echo >> .env.$ENV &&
+            echo 'VITE_SENTRYURL=${VITE_SENTRYURL}' >> .env.$ENV &&
+            echo >> .env.$ENV &&
+            echo 'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}' >> .env.$ENV
       - run:
           name: check env files
           command: echo $ENV
@@ -70,6 +73,20 @@ commands:
         - store_artifacts:
             path: api/archive.tar.gz
             destination: /home/circleci/project/api.tar.gz
+
+  app_build:
+    steps:
+      - checkout:
+          path: ~/project
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Build
+          command: cd app && npm run build --mode ${ENV}
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - app/build
 
 jobs:
   app-npm-install:
@@ -138,20 +155,15 @@ jobs:
     steps:
       - app_set_env_file
 
-  app-build:
+  app-build-staging:
     executor: node
     steps:
-      - checkout:
-          path: ~/project
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: Build
-          command: cd app && npm run build --mode ${ENV}
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - app/build
+      - app_build
+
+  app-build-production:
+    executor: node
+    steps:
+      - app_build
 
   api-build:
     executor: node
@@ -235,16 +247,27 @@ workflows:
             branches:
               only:
                 - main
-      - app-build:
+      - app-build-staging:
           requires:
             - app-npm-install
+          filters:
+            branches:
+              only:
+                - develop
+      - app-build-production:
+          requires:
+            - app-npm-install
+          filters:
+            branches:
+              only:
+                - main
       - api-build:
           requires:
             - api-lint
       - build-archives-staging:
           context: cheatty-staging
           requires:
-            - app-build
+            - app-build-staging
             - api-build
           filters:
             branches:
@@ -253,7 +276,7 @@ workflows:
       - build-archives-production:
           context: cheatty-production
           requires:
-            - app-build
+            - app-build-production
             - api-build
           filters:
             branches:
