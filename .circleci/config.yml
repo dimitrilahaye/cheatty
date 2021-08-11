@@ -107,7 +107,7 @@ jobs:
           at: ~/project
       - run:
           name: Build
-          command: cd app && npm run build --mode = ${ENV}
+          command: cd app && npm run build --mode ${ENV}
       - persist_to_workspace:
           root: ~/project
           paths:
