@@ -25,8 +25,7 @@ commands:
           paths:
             - node_modules
 
-  app-set-env-file:
-    executor: node
+  app_set_env_file:
     steps:
       - checkout:
           path: ~/project
@@ -100,15 +99,13 @@ jobs:
 
   app-set-env-file-staging:
     executor: node
-    context: cheatty-staging
     steps:
-      - app-set-env-file
+      - app_set_env_file
 
   app-set-env-file-prod:
     executor: node
-    context: cheatty-production
     steps:
-      - app-set-env-file
+      - app_set_env_file
 
   app-build:
     executor: node
@@ -211,6 +208,7 @@ workflows:
           requires:
             - app-npm-install
       - app-set-env-file-staging:
+          context: cheatty-staging
           requires:
             - app-npm-install
           filters:
@@ -218,6 +216,7 @@ workflows:
               only:
                 - develop
       - app-set-env-file-prod:
+          context: cheatty-production
           requires:
             - app-npm-install
           filters:
