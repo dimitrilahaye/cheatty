@@ -38,6 +38,7 @@ jobs:
           root: ~/project
           paths:
             - app/node_modules
+
   api-npm-install:
     executor: node
     working_directory: ~/project/api
@@ -50,6 +51,7 @@ jobs:
           root: ~/project
           paths:
             - api/node_modules
+            
   app-lint:
     executor: node
     steps:
@@ -59,6 +61,7 @@ jobs:
       - run:
           name: Run linter
           command: cd app && npm run lint
+
   api-lint:
     executor: node
     steps:
@@ -68,6 +71,7 @@ jobs:
       - run:
           name: Run linter
           command: cd api && npm run lint
+
   app-validate:
     executor: node
     steps:
@@ -77,9 +81,27 @@ jobs:
       - run:
           name: Run validate
           command: cd app && npm run validate
+
+  app-set-env-file:
+    executor: node
+    steps:
+      - checkout:
+          path: ~/project
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Set env file
+          command: |
+            cd app &&
+            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.${ENV} &&
+            echo $'VITE_API=${VITE_API}\n' > .env.${ENV} &&
+            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.${ENV} &&
+            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.${ENV}
+
   app-build:
     executor: node
     steps:
+      - env/attach-env
       - checkout:
           path: ~/project
       - attach_workspace:
@@ -91,6 +113,7 @@ jobs:
           root: ~/project
           paths:
             - app/build
+
   api-build:
     executor: node
     steps:
@@ -105,6 +128,7 @@ jobs:
           root: ~/project
           paths:
             - api/dist
+
   build-archives:
     executor: node
     steps:
@@ -133,6 +157,7 @@ jobs:
       - store_artifacts:
           path: api/archive.tar.gz
           destination: /home/circleci/project/api.tar.gz
+
   app-sentry-release:
     docker:
       - image: getsentry/sentry-cli:1.40.0
@@ -145,6 +170,7 @@ jobs:
       - run: sentry-cli releases new --project ${SENTRY_PROJECT} ${SENTRY_PROJECT}@${CIRCLE_SHA1}
       - run: sentry-cli releases files ${SENTRY_PROJECT}@${CIRCLE_SHA1} upload-sourcemaps app/build
       - run: sentry-cli releases finalize ${SENTRY_PROJECT}@${CIRCLE_SHA1}
+
   api-sentry-release:
     docker:
       - image: getsentry/sentry-cli:1.40.0
@@ -173,6 +199,22 @@ workflows:
       - app-validate:
           requires:
             - app-npm-install
+      - app-set-env-file:
+          context: cheatty-staging
+          requires:
+            - app-npm-install
+          filters:
+            branches:
+              only:
+                - develop
+      - app-set-env-file:
+          context: cheatty-production
+          requires:
+            - app-npm-install
+          filters:
+            branches:
+              only:
+                - main
       - app-build:
           requires:
             - app-lint
