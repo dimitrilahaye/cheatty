@@ -26,18 +26,47 @@ commands:
             - node_modules
 
   app_set_env_file:
-    parameters:
-      env:
-        type: string
     steps:
+      - checkout:
+          path: ~/project
+      - attach_workspace:
+          at: ~/project
       - run:
-          name: Set env file for env << parameters.env >>
+          name: Set env file
           command: |
             cd app &&
-            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.<< parameters.env >> &&
-            echo $'VITE_API=${VITE_API}\n' > .env.<< parameters.env >> &&
-            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.<< parameters.env >> &&
-            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.<< parameters.env >>
+            echo $'VITE_NODE_ENV=${VITE_NODE_ENV}\n' > .env.${ENV} &&
+            echo $'VITE_API=${VITE_API}\n' > .env.${ENV} &&
+            echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.${ENV} &&
+            echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.${ENV}
+
+  build_archives:
+      steps:
+        - checkout
+        - attach_workspace:
+            at: ~/project
+        - run:
+            name: Remove dev dependencies from app
+            command: cd app &&  npm install --only=production
+        - run:
+            name: Remove dev dependencies from api
+            command: cd api &&  npm install --only=production
+        - run:
+            name: Create app archive
+            command: |
+              tar -czf archive.tar.gz ./package.json ./node_modules ./build .env.${ENV}
+            working_directory: ~/project/app
+        - store_artifacts:
+            path: app/archive.tar.gz
+            destination: /home/circleci/project/app.tar.gz
+        - run:
+            name: Create api archive
+            command: |
+              tar -czf archive.tar.gz ./package.json ./node_modules ./dist
+            working_directory: ~/project/api
+        - store_artifacts:
+            path: api/archive.tar.gz
+            destination: /home/circleci/project/api.tar.gz
 
 jobs:
   app-npm-install:
@@ -99,22 +128,12 @@ jobs:
   app-set-env-file-staging:
     executor: node
     steps:
-      - checkout:
-          path: ~/project
-      - attach_workspace:
-          at: ~/project
-      - app_set_env_file:
-          env: staging
+      - app_set_env_file
 
   app-set-env-file-prod:
     executor: node
     steps:
-      - checkout:
-          path: ~/project
-      - attach_workspace:
-          at: ~/project
-      - app_set_env_file:
-          env: production
+      - app_set_env_file
 
   app-build:
     executor: node
@@ -146,34 +165,15 @@ jobs:
           paths:
             - api/dist
 
-  build-archives:
+  build-archives-staging:
     executor: node
     steps:
-      - checkout
-      - attach_workspace:
-          at: ~/project
-      - run:
-          name: Remove dev dependencies from app
-          command: cd app &&  npm install --only=production
-      - run:
-          name: Remove dev dependencies from api
-          command: cd api &&  npm install --only=production
-      - run:
-          name: Create app archive
-          command: |
-            tar -czf archive.tar.gz ./package.json ./node_modules ./build .env.${ENV}
-          working_directory: ~/project/app
-      - store_artifacts:
-          path: app/archive.tar.gz
-          destination: /home/circleci/project/app.tar.gz
-      - run:
-          name: Create api archive
-          command: |
-            tar -czf archive.tar.gz ./package.json ./node_modules ./dist
-          working_directory: ~/project/api
-      - store_artifacts:
-          path: api/archive.tar.gz
-          destination: /home/circleci/project/api.tar.gz
+      - build_archives
+
+  build-archives-production:
+    executor: node
+    steps:
+      - build_archives
 
   app-sentry-release:
     docker:
@@ -238,25 +238,53 @@ workflows:
       - api-build:
           requires:
             - api-lint
-      - build-archives:
+      - build-archives-staging:
+          context: cheatty-staging
           requires:
             - app-build
             - api-build
-      - app-sentry-release:
-          context: sentry
-          requires:
-            - build-archives
           filters:
             branches:
               only:
                 - develop
+      - build-archives-production:
+          context: cheatty-production
+          requires:
+            - app-build
+            - api-build
+          filters:
+            branches:
+              only:
+                - main
+      - app-sentry-release:
+          context: sentry
+          requires:
+            - build-archives-staging
+          filters:
+            branches:
+              only:
+                - develop
+      - api-sentry-release:
+          context: sentry
+          requires:
+            - build-archives-staging
+          filters:
+            branches:
+              only:
+                - develop
+      - app-sentry-release:
+          context: sentry
+          requires:
+            - build-archives-production
+          filters:
+            branches:
+              only:
                 - main
       - api-sentry-release:
           context: sentry
           requires:
-            - build-archives
+            - build-archives-production
           filters:
             branches:
               only:
-                - develop
                 - main
