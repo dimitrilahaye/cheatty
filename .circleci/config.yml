@@ -43,6 +43,10 @@ commands:
             echo 'VITE_SENTRYURL=${VITE_SENTRYURL}' >> .env.$ENV &&
             echo >> .env.$ENV &&
             echo 'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}' >> .env.$ENV
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - app/.env.$ENV
 
   build_archives:
       steps:
