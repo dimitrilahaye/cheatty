@@ -35,6 +35,7 @@ commands:
           name: Set env file
           command: |
             cd app &&
+            pwd &&
             echo 'VITE_NODE_ENV=${VITE_NODE_ENV}' > .env.$ENV &&
             echo >> .env.$ENV &&
             echo 'VITE_API=${VITE_API}' >> .env.$ENV &&
@@ -42,9 +43,6 @@ commands:
             echo 'VITE_SENTRYURL=${VITE_SENTRYURL}' >> .env.$ENV &&
             echo >> .env.$ENV &&
             echo 'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}' >> .env.$ENV
-      - run:
-          name: check env files
-          command: echo $ENV
 
   build_archives:
       steps:
@@ -248,6 +246,7 @@ workflows:
               only:
                 - main
       - app-build-staging:
+          context: cheatty-staging
           requires:
             - app-npm-install
           filters:
@@ -255,6 +254,7 @@ workflows:
               only:
                 - develop
       - app-build-production:
+          context: cheatty-production
           requires:
             - app-npm-install
           filters:
