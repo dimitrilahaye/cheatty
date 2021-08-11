@@ -36,14 +36,15 @@ commands:
           command: |
             cd app &&
             pwd &&
-            echo 'VITE_NODE_ENV=${VITE_NODE_ENV}' > .env.$ENV &&
-            echo >> .env.$ENV &&
-            echo 'VITE_API=${VITE_API}' >> .env.$ENV &&
-            echo >> .env.$ENV &&
-            echo 'VITE_SENTRYURL=${VITE_SENTRYURL}' >> .env.$ENV &&
-            echo >> .env.$ENV &&
-            echo 'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}' >> .env.$ENV &&
-            ls -lart
+            echo 'VITE_NODE_ENV=${VITE_NODE_ENV}' > .env.${ENV} &&
+            echo >> .env.${ENV} &&
+            echo 'VITE_API=${VITE_API}' >> .env.${ENV} &&
+            echo >> .env.${ENV} &&
+            echo 'VITE_SENTRYURL=${VITE_SENTRYURL}' >> .env.${ENV} &&
+            echo >> .env.${ENV} &&
+            echo 'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}' >> .env.${ENV} &&
+            ls -lart &&
+            cat .env.${ENV}
       - persist_to_workspace:
           root: ~/project
           paths:
