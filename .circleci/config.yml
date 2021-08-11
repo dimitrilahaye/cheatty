@@ -199,6 +199,7 @@ workflows:
           requires:
             - app-npm-install
       - app-set-env-file:
+          name: staging
           context: cheatty-staging
           requires:
             - app-npm-install
@@ -207,6 +208,7 @@ workflows:
               only:
                 - develop
       - app-set-env-file:
+          name: production
           context: cheatty-production
           requires:
             - app-npm-install
