@@ -3,11 +3,18 @@ server {
 
     server_name {{ domain }};
 
-    location /.well-known/acme-challenge {
-        alias /var/www/html/.well-known/acme-challenge;
-    }
+    {% if basic_auth_password is defined and basic_auth_password is not none %}
+        auth_basic "Restricted Access";
+        auth_basic_user_file /etc/nginx/{{ site }}.htpasswd;
+    {% endif %}
 
-    location / {
-        return 301 https://$server_name$request_uri;
-    }
+    {{ config|indent }}
+
+    # location /.well-known/acme-challenge {
+    #   alias /var/www/html/.well-known/acme-challenge;
+    # }
+
+    # location / {
+    #   return 301 https://$server_name$request_uri;
+    # }
 }

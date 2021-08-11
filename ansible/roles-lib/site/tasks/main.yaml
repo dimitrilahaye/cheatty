@@ -15,16 +15,16 @@
     htpasswd_password: '{{ basic_auth_password }}'
   when: basic_auth_password is defined and basic_auth_password is not none
 
-- import_role:
-    name: letsencrypt
-  vars:
-    deploy_hook: service nginx reload
-    certificates:
-      - domain: '{{ domain }}'
-        webroot: /var/www/html/
+# - import_role:
+#     name: letsencrypt
+#   vars:
+#     deploy_hook: service nginx reload
+#     certificates:
+#       - domain: '{{ domain }}'
+#         webroot: /var/www/html/
 
-- include_role:
-    name: nginx
-  vars:
-    sites:
-      '{{ site }}-https': '{{ lookup("template", "https.conf.j2") }}'
+# - include_role:
+#     name: nginx
+#   vars:
+#     sites:
+#       '{{ site }}-https': '{{ lookup("template", "https.conf.j2") }}'
