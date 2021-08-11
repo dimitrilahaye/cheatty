@@ -39,6 +39,9 @@ commands:
             echo $'VITE_API=${VITE_API}\n' > .env.$ENV &&
             echo $'VITE_SENTRYURL=${VITE_SENTRYURL}\n' > .env.$ENV &&
             echo $'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}\n' > .env.$ENV
+      - run:
+          name: check env files
+          command: echo $ENV
 
   build_archives:
       steps:
@@ -54,7 +57,7 @@ commands:
         - run:
             name: Create app archive
             command: |
-              tar -czf archive.tar.gz ./package.json ./node_modules ./build .env.${ENV}
+              tar -czf archive.tar.gz ./package.json ./node_modules ./build ./.env.${ENV}
             working_directory: ~/project/app
         - store_artifacts:
             path: app/archive.tar.gz
