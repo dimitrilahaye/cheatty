@@ -107,7 +107,7 @@ jobs:
           at: ~/project
       - run:
           name: Build
-          command: cd app && npm run build
+          command: cd app && npm run build --mode = ${ENV}
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -143,7 +143,7 @@ jobs:
       - run:
           name: Create app archive
           command: |
-            tar -czf archive.tar.gz ./package.json ./node_modules ./build
+            tar -czf archive.tar.gz ./package.json ./node_modules ./build .env.${ENV}
           working_directory: ~/project/app
       - store_artifacts:
           path: app/archive.tar.gz
@@ -216,8 +216,7 @@ workflows:
                 - main
       - app-build:
           requires:
-            - app-lint
-            - app-validate
+            - app-set-env-file
       - api-build:
           requires:
             - api-lint
