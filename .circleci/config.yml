@@ -42,7 +42,8 @@ commands:
             echo >> .env.$ENV &&
             echo 'VITE_SENTRYURL=${VITE_SENTRYURL}' >> .env.$ENV &&
             echo >> .env.$ENV &&
-            echo 'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}' >> .env.$ENV
+            echo 'VITE_SENTRYTRACES=${VITE_SENTRYTRACES}' >> .env.$ENV &&
+            ls -lart
       - persist_to_workspace:
           root: ~/project
           paths:
